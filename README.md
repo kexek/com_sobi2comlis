@@ -1,6 +1,6 @@
 ## sobi2comlis
 
-**sobi2comlis** is a component for older versions of Joomla! and Sobi2 for displaying latest sobi2 reviews on a separate page. 
+**sobi2comlis** is a component for older versions of Joomla! and SOBI2 for displaying latest SOBI2 reviews on a separate page. 
 
 ## Requirements
 
