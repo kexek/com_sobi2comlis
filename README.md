@@ -6,7 +6,7 @@
 
 * Joomla! 1.0.15 (Compatible with Lavra Edition 2008)
 * SOBI2
-* SOBIE2 Reviews plugin
+* SOBI2 Reviews plugin
 
 ## Installation
 
