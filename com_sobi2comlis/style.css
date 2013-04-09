@@ -1,0 +1,22 @@
+.bn {
+    color: #999;
+}
+
+.reviewentry {
+    border-bottom: 1px dashed #ccc;
+    margin: 20px 0;
+}
+
+.reviewtitle {
+    color: #4CA55E;
+}
+
+.reviewcontent {
+    margin: 5px 0;
+}
+
+.pagination {
+    margin: 20px 0;
+    font-size: 1.2em;
+}
+
