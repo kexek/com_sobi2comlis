@@ -3,8 +3,8 @@
  * @todo decrease db queries; currently: 2+(20*3)=62
  */
 
-(defined( '_VALID_MOS' ) || defined( '_JEXEC' ) ) || ( trigger_error( 'Restricted access', E_USER_ERROR ) && exit() );
-defined( "DS" ) || define( "DS", DIRECTORY_SEPARATOR);
+(defined('_VALID_MOS') || defined('_JEXEC') ) || (trigger_error('Restricted access', E_USER_ERROR) && exit());
+defined("DS") || define("DS", DIRECTORY_SEPARATOR);
 
 $mainframe->_head['title'] = 'Page title';
 $mainframe->appendMetaTag('description', 'Page description');
@@ -31,7 +31,6 @@ function date_convert ($data, $year, $time, $second){
     }
 
     return $res;
-
 }
 
 /* Pagination */
@@ -55,7 +54,7 @@ function pagerize($pgr, $total) {
 }
 
 $pgr = intval(preg_replace("/[^0-9]+/", "", mosGetParam($_REQUEST,'page','0'))); //By default page 0
-if ($pgr == '1') $pgr = '0'; //Page 1 is the same that page 0
+if ($pgr == '1') $pgr = '0'; //Page 1 is the same as page 0
 $frm = intval(preg_replace("/[^0-9]+/", "", mosGetParam($_REQUEST,'from','20'))); //Reviews per page (20 reviews by default)
 
 /* Working with DB */
@@ -73,6 +72,7 @@ $list = $database->loadObjectList();
 
 <!-- Pagination -->
 <div class="pagination"><?=pagerize($pgr, $total);?></div>
+<!-- /Pagination -->
 
 <!-- Review entries -->
 <?php
@@ -88,7 +88,7 @@ foreach($list as $rvws) {
     if (!empty($typed)) $reviewCategory = ' - ' . $reviewCategory;
     $rvws->added = date_convert ($rvws->added, 1, 1, 0);
     if ($rvws->username == '') $rvws->username = 'Anonymous user';
-    if ($rvws->title == '') $rvws->title = '<span class="bn">без темы</span>';
+    if ($rvws->title == '') $rvws->title = '<span class="bn">no topic</span>';
 
 echo <<<HTML
     <div class="reviewentry">
@@ -105,5 +105,6 @@ HTML;
 
 <!-- Pagination -->
 <div class="pagination"><?=pagerize($pgr, $total);?></div>
+<!-- /Pagination -->
 
 <!-- /Reviews -->
