@@ -1,7 +1,4 @@
 <?php
-/*
- * @todo decrease db queries; currently: 2+(20*3)=62
- */
 
 (defined('_VALID_MOS') || defined('_JEXEC') ) || (trigger_error('Restricted access', E_USER_ERROR) && exit());
 defined("DS") || define("DS", DIRECTORY_SEPARATOR);
@@ -62,7 +59,39 @@ $database->setQuery("SELECT COUNT(*) FROM #__sobi2_plugin_reviews");
 $posts = $database->loadResult();
 $total = intval(($posts - 1) / $frm) + 1;
 $pgr = intval($pgr);
-$database->setQuery("SELECT itemid, title, review, username, email, added FROM #__sobi2_plugin_reviews WHERE review!='' ORDER BY added DESC LIMIT $pgr, $frm");
+$database->setQuery("
+SELECT
+	#__sobi2_plugin_reviews.itemid, 
+	#__sobi2_plugin_reviews.title, 
+	#__sobi2_plugin_reviews.review, 
+	#__sobi2_plugin_reviews.username, 
+	#__sobi2_plugin_reviews.email, 
+	#__sobi2_plugin_reviews.added, 
+	#__sobi2_item.title AS item_name, 
+	#__sobi2_fields_data.data_txt AS item_city, 
+	t.name AS item_category 
+FROM 
+	#__sobi2_plugin_reviews  
+LEFT JOIN 
+	#__sobi2_item USING(itemid) 
+LEFT JOIN 
+	#__sobi2_fields_data USING(itemid) 
+LEFT JOIN (
+		SELECT 
+			#__sobi2_cat_items_relations.itemid, 
+			#__sobi2_categories.name 
+		FROM #__sobi2_categories 
+		LEFT JOIN #__sobi2_cat_items_relations USING(catid) 
+) AS t USING(itemid) 
+WHERE 
+	#__sobi2_plugin_reviews.review!='' 
+AND 
+	#__sobi2_fields_data.fieldid = '3' 
+ORDER BY 
+	#__sobi2_plugin_reviews.added DESC 
+LIMIT 
+	$pgr, $frm
+");
 $list = $database->loadObjectList();
 
 ?>
@@ -77,25 +106,19 @@ $list = $database->loadObjectList();
 <!-- Review entries -->
 <?php
 
-foreach($list as $rvws) {
-    $database->setQuery("SELECT title FROM #__sobi2_item WHERE itemid = '" .$rvws->itemid. "' LIMIT 1");
-    $reviewTitle = $database->loadResult();
-    $database->setQuery("SELECT data_txt FROM #__sobi2_fields_data WHERE itemid = '" .$rvws->itemid. "' AND fieldid = '3' LIMIT 1");
-    $reviewCity = $database->loadResult();
-    if (!empty($reviewCity)) $reviewCity = '(' .$reviewCity. ')';
-    $database->setQuery("SELECT name FROM #__sobi2_categories WHERE catid = (SELECT catid FROM #__sobi2_cat_items_relations WHERE itemid = '" .$rvws->itemid. "' LIMIT 1) LIMIT 1");
-    $reviewCategory = $database->loadResult();
-    if (!empty($typed)) $reviewCategory = ' - ' . $reviewCategory;
-    $rvws->added = date_convert ($rvws->added, 1, 1, 0);
-    if ($rvws->username == '') $rvws->username = 'Anonymous user';
-    if ($rvws->title == '') $rvws->title = '<span class="bn">no topic</span>';
+foreach($list as $review) {
+    if (!empty($review->item_city)) $review->item_city = '(' .$review->item_city. ')';
+    if (!empty($review->item_category)) $review->item_category = ' - ' . $review->item_category;
+    $review->added = date_convert($review->added, 1, 1, 0);
+    if ($review->username == '') $review->username = 'Anonymous user';
+    if ($review->title == '') $review->title = '<span class="bn">no topic</span>';
 
 echo <<<HTML
     <div class="reviewentry">
-        <strong>Review about <a href="index.php?option=com_sobi2&amp;sobi2Task=sobi2Details&amp;sobi2Id=$rvws->itemid">$reviewTitle</a> $reviewCity - $reviewCategory</strong><br />
-        <span class="reviewtitle">$rvws->title</span><br />
-        <div class="reviewcontent">$rvws->review</div>
-        <span class="bn">Added $rvws->added</span>
+        <strong>Review about <a href="index.php?option=com_sobi2&amp;sobi2Task=sobi2Details&amp;sobi2Id=$review->itemid">$review->item_name</a> $review->item_city $review->item_category</strong><br />
+        <span class="reviewtitle">$review->title</span><br />
+        <div class="reviewcontent">$review->review</div>
+        <span class="bn">Added $review->added</span>
     </div>
 HTML;
 } # end foreach
